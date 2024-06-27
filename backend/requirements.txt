@@ -1,1 +1,6 @@
-
+flask
+flask-sqlalchemy
+google-cloud-storage
+openai
+celery
+sendgrid
