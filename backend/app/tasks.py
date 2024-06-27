@@ -1,8 +1,7 @@
 from celery import Celery
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+from flask_mail import Message
+from app import mail
 from app.models import User, Question
-from config import Config
 import random
 
 celery = Celery(__name__, broker='redis://localhost:6379/0')
@@ -14,16 +13,10 @@ def send_daily_questions():
         questions = Question.query.join(Document).filter(Document.user_id == user.id).order_by(func.random()).limit(5).all()
         if questions:
             question_text = "\n".join([f"{i+1}. {q.content}" for i, q in enumerate(questions)])
-            message = Mail(
-                from_email='quiz@yourdomain.com',
-                to_emails=user.email,
-                subject='Your Daily Quiz Questions',
-                html_content=f'<p>Here are your daily quiz questions:</p><pre>{question_text}</pre>'
-            )
-            try:
-                sg = SendGridAPIClient(Config.SENDGRID_API_KEY)
-                response = sg.send(message)
-            except Exception as e:
-                print(str(e))
+            msg = Message('Your Daily Quiz Questions',
+                          sender='your-email@gmail.com',
+                          recipients=[user.email])
+            msg.body = f'Here are your daily quiz questions:\n\n{question_text}'
+            mail.send(msg)
 
 # Schedule this task to run daily at 8:00 AM

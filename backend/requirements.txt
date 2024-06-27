@@ -3,4 +3,4 @@ flask-sqlalchemy
 google-cloud-storage
 openai
 celery
-sendgrid
+flask-mail
