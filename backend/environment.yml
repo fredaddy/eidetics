@@ -14,3 +14,4 @@ dependencies:
     - celery==5.0.5
     - itsdangerous==1.1.0
     - redis
+    - Flask-Migrate==3.1.0
