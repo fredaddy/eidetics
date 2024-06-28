@@ -3,16 +3,27 @@ import openai
 from app import db
 from app.models import Question
 from config import Config
+import logging
 
 def upload_file_to_gcs(file):
-    client = storage.Client(project=Config.GOOGLE_CLOUD_PROJECT)
-    bucket = client.bucket(Config.GOOGLE_CLOUD_STORAGE_BUCKET)
-    blob = bucket.blob(file.filename)
-    blob.upload_from_string(
-        file.read(),
-        content_type=file.content_type
-    )
-    return blob.public_url
+    from google.cloud import storage
+    import os
+
+    client = storage.Client()
+    bucket_name = os.getenv('GOOGLE_CLOUD_STORAGE_BUCKET')
+    
+    try:
+        bucket = client.bucket(bucket_name)
+        blob = bucket.blob(file.filename)
+        blob.upload_from_string(
+            file.read(),
+            content_type=file.content_type
+        )
+        logging.info("Upload successful: {}".format(blob.public_url))
+        return blob.public_url
+    except Exception as e:
+        logging.error("Failed to upload to GCS: {}".format(str(e)))
+        raise
 
 def generate_questions(document_id, gcs_url):
     # Download the file from GCS and extract text

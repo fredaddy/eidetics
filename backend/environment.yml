@@ -15,3 +15,4 @@ dependencies:
     - itsdangerous==1.1.0
     - redis
     - Flask-Migrate==3.1.0
+    - flask-cors
