@@ -8,7 +8,10 @@ function App() {
   useEffect(() => {
     axios.get('http://127.0.0.1:5000/test')
       .then(response => setMessage(response.data.message))
-      .catch(error => console.error('Error:', error));
+      .catch(error => {
+        console.error('Error fetching test message:', error);
+        setMessage('Failed to fetch test message');
+      });
   }, []);
 
   const handleFileChange = (e) => {
@@ -30,7 +33,12 @@ function App() {
       alert(response.data.message);
     } catch (error) {
       console.error('Error uploading file:', error);
-      alert('Error uploading file');
+      let errorMessage = 'Error uploading file'; // Default error message
+      if (error.response && error.response.data && error.response.data.error) {
+        // If the server sends a specific error message, display it
+        errorMessage = error.response.data.error;
+      }
+      alert(errorMessage);
     }
   };
 
